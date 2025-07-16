@@ -85,8 +85,19 @@ class SQLServerConnection:
         """
 
         with self.get_connection() as conn:
-            cursor = conn.execute(request.query, request.params)
+            cursor = conn.cursor()
+
+            if request.params:
+                cursor.execute(request.query, request.params)
+            else:
+                cursor.execute(request.query)
+
             rows = cursor.fetchall()
+
+            # Convert rows to a list of dictionaries
+            columns = [column[0] for column in cursor.description]
+            rows = [dict(zip(columns, row)) for row in rows]
+
             if not rows:
                 return QueryResponse(results=[], row_count=0)
             return QueryResponse(results=rows, row_count=len(rows))
