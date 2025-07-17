@@ -1,5 +1,8 @@
 from mcp.server.fastmcp import FastMCP
 
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
+
 from stack_overflow_mcp.tools.tools import (
     get_last_post_with_activity,
     get_most_viewed_posts,
@@ -12,6 +15,11 @@ server = FastMCP(
     host="0.0.0.0",
     port=8000,
 )
+
+
+@server.custom_route("/health", methods=["GET"])  # type: ignore
+async def health_check(request: Request) -> Response:
+    return JSONResponse({"status": "ok"})
 
 
 server.add_tool(
