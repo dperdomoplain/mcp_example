@@ -45,6 +45,12 @@ Installs the required packages:
 - `pydantic` for data validation
 - `pydantic-settings` for configuration management
 
+### 5. Debugging Inspector
+
+```bash
+npx @modelcontextprotocol/inspector
+```
+
 ## Features
 
 This MCP server includes the following tools:
