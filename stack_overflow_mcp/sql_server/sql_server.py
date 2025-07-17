@@ -1,5 +1,6 @@
 import pyodbc
-from typing import Any, List
+from pyodbc import Connection
+from typing import Any, Generator, List
 from contextlib import contextmanager
 from pydantic import BaseModel, Field
 
@@ -33,8 +34,7 @@ class SQLServerConnection:
             config: SQLServerConfig instance with connection parameters
         """
         self.config = config
-        self._connection = None
-        self._cursor = None
+        self._connection: Connection | None = None
 
     def _build_connection_string(self) -> str:
         """Build connection string based on authentication method"""
@@ -58,13 +58,13 @@ class SQLServerConnection:
             print(f"Connection failed: {str(e)}")
             return False
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         if self._connection:
             self._connection.close()
             self._connection = None
 
     @contextmanager
-    def get_connection(self):
+    def get_connection(self) -> Generator[Connection | None, Any, None]:
         """Context manager for database connections"""
         try:
             if not self.connect():
@@ -85,6 +85,9 @@ class SQLServerConnection:
         """
 
         with self.get_connection() as conn:
+            if conn is None:
+                raise Exception("Database connection is not available.")
+
             cursor = conn.cursor()
 
             if request.params:
@@ -94,7 +97,6 @@ class SQLServerConnection:
 
             rows = cursor.fetchall()
 
-            # Convert rows to a list of dictionaries
             columns = [column[0] for column in cursor.description]
             rows = [dict(zip(columns, row)) for row in rows]
 

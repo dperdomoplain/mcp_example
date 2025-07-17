@@ -28,4 +28,4 @@ server.add_tool(
 
 
 if __name__ == "__main__":
-    server.run("sse")
+    server.run("streamable-http")

@@ -6,7 +6,7 @@ This project uses `uv` as a Python package and virtual environment manager. The 
 
 ### 1. Initialize the project
 ```bash
-uv init --name mcp_example .
+uv init --name mcp_example --python 3.13 . 
 ```
 This command initializes a new Python project in the current directory (`.`) with the name `mcp_example` and specifies that Python 3.13 should be used.
 
