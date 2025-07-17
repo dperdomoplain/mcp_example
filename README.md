@@ -1,8 +1,10 @@
-# mcp_example
+# Stack Overflow MCP Server
 
-This project uses `uv` as a Python package and virtual environment manager. The following commands explain how to set up the project:
+This is a Model Context Protocol (MCP) server that provides tools to query Stack Overflow data from a SQL Server database. The project uses `uv` as a Python package and virtual environment manager.
 
 ## Project Setup
+
+The following commands explain how to set up the project:
 
 ### 1. Initialize the project
 ```bash
@@ -10,9 +12,17 @@ uv init --name mcp_example --python 3.13 .
 ```
 This command initializes a new Python project in the current directory (`.`) with the name `mcp_example` and specifies that Python 3.13 should be used.
 
-### 2. Create virtual environment on mac
+### 2. Create virtual environment
+
+#### 2.1 Create virtual environment specifying path
 ```bash
 uv venv --python /opt/homebrew/bin/python3
+```
+
+#### 2.2 Create virtual environment on windows, linux and mac
+
+```bash
+uv venv --python 3.13
 ```
 Creates a virtual environment using `uv`. The virtual environment is stored in the `.venv` directory.
 
@@ -32,32 +42,17 @@ uv add pydantic-settings
 Installs the required packages:
 - `mcp` with CLI extras for Model Context Protocol
 - `pyodbc` for SQL Server connectivity
-- `pydantic` for data validation and configuration management
+- `pydantic` for data validation
+- `pydantic-settings` for configuration management
 
 ## Features
 
 This MCP server includes the following tools:
 
-### 1. Basic Math Tool
-- `add(a, b)` - Adds two numbers
+- **`get_most_viewed_posts`**: Retrieves the most viewed posts from the Stack Overflow database
+- **`get_last_post_with_activity`**: Gets the most recent posts with activity from the Stack Overflow database
 
-### 2. SQL Server Tools
-- `sql_server_query()` - Connect to SQL Server and execute queries
-- `sql_server_list_tables()` - List all tables in a database
-- `sql_server_table_info()` - Get detailed information about a specific table
-- `sql_server_test_connection()` - Test connection to SQL Server database
-- `sql_server_database_info()` - Get basic database information
-- `sql_server_list_schemas()` - List all schemas in the database
 
-### 3. Environment-based SQL Server Tools
-- `sql_server_query_env()` - Execute queries using environment variables
-- `sql_server_test_connection_env()` - Test connection using environment variables
-
-### 4. Greeting Resources
-- Dynamic greeting resources for personalized messages
-
-### 5. Prompt Templates
-- `greet_user()` - Generate greeting prompts with different styles
 
 ## Architecture
 
@@ -73,16 +68,15 @@ The project uses a clean, modern architecture with Pydantic for data validation:
 ## Configuration
 
 ### Environment Variables
-Create a `.env` file (copy from `.env.example`) with your SQL Server configuration:
+Create a `.env` file with your SQL Server configuration:
 
 ```bash
-# SQL Server connection details
-SQL_SERVER=localhost
-SQL_DATABASE=TestDB
-SQL_USERNAME=your_username
-SQL_PASSWORD=your_password
-SQL_PORT=1433
-SQL_TRUSTED_CONNECTION=false
+SERVER=localhost
+DATABASE=TestDB
+USERNAME=your_username
+PASSWORD=your_password
+PORT=1433
+TRUSTED_CONNECTION=false
 ```
 
 ### Pydantic Models
@@ -91,17 +85,29 @@ The project uses Pydantic models for data validation:
 - **`SQLServerConfig`**: Configuration with validation
 - **`QueryRequest`**: SQL query requests with validation
 - **`QueryResponse`**: Structured query responses
-- **`TableInfoRequest`**: Table information requests
-- **`ConnectionTestResponse`**: Connection test results
 
 ## SQL Server Setup
 
 ### Prerequisites
-You need to install the ODBC Driver 18 for SQL Server:
+You need to install the ODBC Driver 17 for SQL Server:
 
-### Usage Examples
+#### On macOS:
+Download and install from the [Microsoft SQL Server ODBC Driver download page](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/install-microsoft-odbc-driver-sql-server-macos?view=sql-server-ver17)
 
-See `SQL_SERVER_CONFIG.md` for detailed configuration examples and usage instructions.
+#### On Windows:
+Download and install from the [Microsoft SQL Server ODBC Driver download page](https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
+
+#### On Linux:
+Download and install from the [Microsoft SQL Server ODBC Driver download page](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver17)
+
+
+### Database Schema
+This MCP server expects a SQL Server database with Stack Overflow data. The database should contain at least a `Posts` table with the following relevant columns:
+- `ViewCount`: Number of times the post has been viewed
+- `LastActivityDate`: The date of the last activity on the post
+- Other standard Stack Overflow post fields
+
+You can obtain Stack Overflow data dumps from the [Stack Exchange Data Dump](https://archive.org/details/stackexchange) and import them into your SQL Server database.
 
 ## Running the Server
 
@@ -110,6 +116,3 @@ uv run main.py
 ```
 
 The server will start and listen for MCP client connections.
-
-
-uv add pyodbc
